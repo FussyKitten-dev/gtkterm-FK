@@ -1,6 +1,17 @@
-# GTKTerm: A GTK+ Serial Port Terminal
+# GTKTerm: A GTK+ Serial Port Terminal (FussyKitten Fork)
 
 <img src="data/gtkterm_256x256.png" align="right" width="20%"/>
+
+This is the FussyKitten fork of GTKTerm, adding macOS support and several usability improvements on top of the upstream project. See the [upstream repo](https://github.com/wvdakker/gtkterm) for the original.
+
+## FussyKitten Features
+
+- **macOS support** — runs natively on macOS (Apple Silicon and Intel). Serial device connect/disconnect monitoring uses a polling fallback since Linux's `libgudev` is not available on macOS.
+- **macOS .app bundle** — `build-macos-app.sh` produces a fully self-contained `gtkterm.app` with all GTK/VTE dependencies bundled. No Homebrew required at runtime.
+- **File > New Instance** (`Ctrl+Shift+N`) — opens an additional independent GTKTerm window from within the app.
+- **View > Always on Top** — toggle to keep the GTKTerm window above all other windows. Setting is persisted across sessions.
+
+---
 
 GTKTerm is a simple, graphical serial port terminal emulator for Linux and macOS. It can be used to communicate with all kinds of devices with a serial interface, such as embedded computers, microcontrollers, modems, GPS receivers, CNC machines and more.
 
