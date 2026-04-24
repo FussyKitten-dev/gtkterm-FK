@@ -1,6 +1,5 @@
 # GTKTerm: A GTK+ Serial Port Terminal
 
-[![CircleCI Badge](https://circleci.com/gh/Jeija/gtkterm.svg?style=shield)](https://circleci.com/gh/Jeija/gtkterm)
 <img src="data/gtkterm_256x256.png" align="right" width="20%"/>
 
 GTKTerm is a simple, graphical serial port terminal emulator for Linux and macOS. It can be used to communicate with all kinds of devices with a serial interface, such as embedded computers, microcontrollers, modems, GPS receivers, CNC machines and more.
@@ -50,7 +49,10 @@ Signal | Action | Usage Example
 You may find it useful to send these signals in your own firmware flashing scripts.
 
 ## Installation
-GTKTerm has a few dependencies-
+
+### Linux
+
+GTKTerm has the following dependencies on Linux:
 * Gtk+3.0 (version 3.12 or higher)
 * vte (version 0.40 or higher)
 * intltool (version 0.40.0 or higher)
@@ -71,6 +73,47 @@ If you wish to install GTKTerm someplace other than the default directory, e.g. 
 	meson build -Dprefix=/usr
 
 Then build and install as usual.
+
+### macOS
+
+GTKTerm supports macOS via [Homebrew](https://brew.sh). Install the required dependencies first:
+
+	brew install gtk+3 vte3 pkg-config meson ninja
+
+Note: `libgudev` is a Linux-only library and is **not** required on macOS. GTKTerm uses a polling fallback for serial device monitoring on macOS.
+
+#### Running directly (without .app bundle)
+
+	meson build
+	ninja -C build
+	./build/src/gtkterm
+
+#### Building a self-contained .app bundle
+
+The included `build-macos-app.sh` script produces a fully self-contained `gtkterm.app` bundle with all dependencies bundled (GTK, VTE, pixbuf loaders, etc.) and a distributable zip at `dist/gtkterm-macos.zip`:
+
+	./build-macos-app.sh
+
+To reuse an existing build directory and only re-bundle (faster iteration):
+
+	./build-macos-app.sh --keep-build
+
+Once built, launch with:
+
+	open gtkterm.app
+
+Or to open additional instances:
+
+	open -n gtkterm.app
+
+> **Note:** The app is not notarized, so macOS Gatekeeper may block it on first launch. To bypass, right-click the app and choose **Open**, or run:
+> ```
+> xattr -dr com.apple.quarantine gtkterm.app
+> ```
+
+#### Multiple instances
+
+Use **File > New Instance** (or `Ctrl+Shift+N`) to launch a new independent window from within the app.
 
 ## Uninstallation
 To uninstall GTKTerm, run:
