@@ -33,6 +33,7 @@ void Set_crlfauto(gboolean crlfauto);
 void Set_autoreconnect_enabled(gboolean autoreconnect_enabled);
 void Set_esc_clear_screen(gboolean esc_clear_screen);
 void Set_timestamp(gboolean timestamp);
+void Set_always_on_top(gboolean always_on_top);
 gint send_serial(gchar *, gint);
 void Put_temp_message(const gchar *, gint);
 void Set_window_title(gchar *msg);

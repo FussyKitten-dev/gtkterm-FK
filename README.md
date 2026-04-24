@@ -3,7 +3,7 @@
 [![CircleCI Badge](https://circleci.com/gh/Jeija/gtkterm.svg?style=shield)](https://circleci.com/gh/Jeija/gtkterm)
 <img src="data/gtkterm_256x256.png" align="right" width="20%"/>
 
-GTKTerm is a simple, graphical serial port terminal emulator for Linux and possibly other POSIX-compliant operating systems. It can be used to communicate with all kinds of devices with a serial interface, such as embedded computers, microcontrollers, modems, GPS receivers, CNC machines and more.
+GTKTerm is a simple, graphical serial port terminal emulator for Linux and macOS. It can be used to communicate with all kinds of devices with a serial interface, such as embedded computers, microcontrollers, modems, GPS receivers, CNC machines and more.
 
 <p align="center">
     <img src="screenshot.png" width="60%"/>
@@ -26,6 +26,7 @@ Key Combination | Effect
 `<ctrl><shift>K` | Clear Scrollback
 `<ctrl><shift>A` | Select All
 `<ctrl><shift>B` | Send Break
+`<ctrl><shift>N` | Open New Instance
 `<ctrl>B` | Send break
 F5 | Open Port
 F6 | Close Port

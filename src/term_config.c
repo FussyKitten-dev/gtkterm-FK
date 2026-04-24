@@ -75,6 +75,7 @@ gint *crlfauto;
 gint *autoreconnect_enabled;
 gint *esc_clear_screen;
 gint *timestamp;
+gint *always_on_top;
 cfgList **macro_list = NULL;
 gchar **font;
 
@@ -110,6 +111,7 @@ cfgStruct cfg[] =
 	{"autoreconnect_enabled", CFG_BOOL, &autoreconnect_enabled},
 	{"esc_clear_screen", CFG_BOOL, &esc_clear_screen},
 	{"timestamp", CFG_BOOL, &timestamp},
+	{"always_on_top", CFG_BOOL, &always_on_top},
 	{"font", CFG_STRING, &font},
 	{"macros", CFG_STRING_LIST, &macro_list},
 	{"term_block_cursor", CFG_BOOL, &block_cursor},
@@ -177,6 +179,7 @@ void ConfigFlags(void)
 	Set_autoreconnect_enabled(config.autoreconnect_enabled);
 	Set_esc_clear_screen(config.esc_clear_screen);
 	Set_timestamp(config.timestamp);
+	Set_always_on_top(config.always_on_top);
 }
 
 /* This list should perhaps be added to the configuration? */
@@ -1180,6 +1183,11 @@ gint Load_configuration_from_file(gchar *config_name)
 				else
 					config.timestamp = FALSE;
 
+				if(always_on_top[i] != -1)
+					config.always_on_top = (gboolean)always_on_top[i];
+				else
+					config.always_on_top = FALSE;
+
 				g_free(term_conf.font);
 				term_conf.font = g_strdup(font[i]);
 
@@ -1387,6 +1395,7 @@ void Hard_default_configuration(void)
 	config.autoreconnect_enabled = FALSE;
 	config.esc_clear_screen = FALSE;
 	config.timestamp = FALSE;
+	config.always_on_top = FALSE;
   config.disable_port_lock = FALSE;
 
 	term_conf.font = g_strdup_printf(DEFAULT_FONT);
@@ -1514,6 +1523,14 @@ void Copy_configuration(int pos)
 		string = g_strdup_printf("True");
 
 	cfgStoreValue(cfg, "timestamp", string, CFG_INI, pos);
+	g_free(string);
+
+	if(config.always_on_top == FALSE)
+		string = g_strdup_printf("False");
+	else
+		string = g_strdup_printf("True");
+
+	cfgStoreValue(cfg, "always_on_top", string, CFG_INI, pos);
 	g_free(string);
 
 	string = g_strdup(term_conf.font);

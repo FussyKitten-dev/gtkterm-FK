@@ -92,6 +92,7 @@ gboolean autoreconnect_on;
 gboolean crlfauto_on;
 gboolean esc_clear_screen_on;
 gboolean timestamp_on = 0;
+gboolean always_on_top_on = 0;
 GtkWidget *StatusBar;
 GtkWidget *signals[6];
 static GtkWidget *Hex_Box;
@@ -134,6 +135,7 @@ void Autoreconnect_toggled_callback(GtkAction *action, gpointer data);
 void CR_LF_auto_toggled_callback(GtkAction *action, gpointer data);
 void esc_clear_screen_toggled_callback(GtkAction *action, gpointer data);
 void timestamp_toggled_callback(GtkAction *action, gpointer data);
+void always_on_top_toggled_callback(GtkAction *action, gpointer data);
 void view_radio_callback(GtkAction *action, gpointer data);
 void view_hexadecimal_chars_radio_callback(GtkAction* action, gpointer data);
 void view_index_toggled_callback(GtkAction *action, gpointer data);
@@ -218,7 +220,8 @@ const GtkToggleActionEntry menu_toggle_entries[] =
 
 	/* View Menu */
 	{"ViewIndex", NULL, N_("Show _index"), NULL, NULL, G_CALLBACK(view_index_toggled_callback), FALSE},
-	{"ViewSendHexData", NULL, N_("_Send hexadecimal data"), NULL, NULL, G_CALLBACK(view_send_hex_toggled_callback), FALSE}
+	{"ViewSendHexData", NULL, N_("_Send hexadecimal data"), NULL, NULL, G_CALLBACK(view_send_hex_toggled_callback), FALSE},
+	{"ViewAlwaysOnTop", NULL, N_("_Always on Top"), NULL, NULL, G_CALLBACK(always_on_top_toggled_callback), FALSE}
 };
 
 const GtkRadioActionEntry menu_view_radio_entries[] =
@@ -297,6 +300,7 @@ static const char *ui_description =
     "      <menuitem action='ViewIndex'/>"
     "      <separator/>"
     "      <menuitem action='ViewSendHexData'/>"
+    "      <menuitem action='ViewAlwaysOnTop'/>"
     "    </menu>"
     "    <menu action='Help'>"
     "      <menuitem action='HelpAbout'/>"
@@ -507,6 +511,25 @@ void timestamp_toggled_callback(GtkAction *action, gpointer data)
 {
 	timestamp_on = gtk_toggle_action_get_active (GTK_TOGGLE_ACTION(action));
 	config.timestamp = timestamp_on ? TRUE : FALSE;
+}
+
+void Set_always_on_top(gboolean always_on_top)
+{
+	GtkAction *action;
+
+	always_on_top_on = always_on_top;
+	gtk_window_set_keep_above(GTK_WINDOW(Fenetre), always_on_top_on);
+
+	action = gtk_action_group_get_action(action_group, "ViewAlwaysOnTop");
+	if(action)
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), always_on_top_on);
+}
+
+void always_on_top_toggled_callback(GtkAction *action, gpointer data)
+{
+	always_on_top_on = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
+	config.always_on_top = always_on_top_on ? TRUE : FALSE;
+	gtk_window_set_keep_above(GTK_WINDOW(Fenetre), always_on_top_on);
 }
 
 void toggle_logging_pause_resume(gboolean currentlyLogging)
