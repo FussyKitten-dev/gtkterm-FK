@@ -61,11 +61,16 @@
 # include <linux/termios.h>	/* For control signals */
 # define NO_TERMIOS		/* Conflicts with <termios.h> */
 #elif defined (HAVE_SYS_TTYCOM_H)
+# include <sys/ttycom.h>	/* For control signals on macOS/BSD */
 #endif
 #include <vte/vte.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 
 #include "term_config.h"
 #include "files.h"
@@ -143,6 +148,7 @@ void update_copy_sensivity(VteTerminal *terminal, gpointer data);
 void edit_paste_callback(GtkAction *action, gpointer data);
 void edit_find_callback(GtkAction *action);
 void edit_select_all_callback(GtkAction *action, gpointer data);
+void file_new_instance_callback(GtkAction *action, gpointer data);
 
 void set_saved_data(GtkWidget *widget, gboolean direction);
 void update_hex_history(GtkWidget *widget);
@@ -162,6 +168,7 @@ const GtkActionEntry menu_entries[] =
 	{"Help", NULL, N_("_Help")},
 
 	/* File menu */
+	{"FileNewInstance", GTK_STOCK_NEW, N_("_New Instance"), "<shift><control>N", NULL, G_CALLBACK(file_new_instance_callback)},
 	{"FileExit", GTK_STOCK_QUIT, NULL, "<shift><control>Q", NULL, gtk_main_quit},
 	{"ClearScreen", GTK_STOCK_CLEAR, N_("_Clear screen"), "<shift><control>L", NULL, G_CALLBACK(clear_buffer)},
 	{"ClearScrollback", GTK_STOCK_CLEAR, N_("_Clear scrollback"), "<shift><control>K", NULL, G_CALLBACK(clear_scrollback)},
@@ -233,6 +240,8 @@ static const char *ui_description =
     "<ui>"
     "  <menubar name='MenuBar'>"
     "    <menu action='File'>"
+	"      <menuitem action='FileNewInstance'/>"
+	"      <separator/>"
     "      <menuitem action='ClearScreen'/>"
     "      <menuitem action='ClearScrollback'/>"
     "      <menuitem action='SendFile'/>"
@@ -313,6 +322,47 @@ void view_send_hex_toggled_callback(GtkAction *action, gpointer data)
 		gtk_widget_show(GTK_WIDGET(Hex_Box));
 	else
 		gtk_widget_hide(GTK_WIDGET(Hex_Box));
+}
+
+void file_new_instance_callback(GtkAction *action, gpointer data)
+{
+	(void)action;
+	(void)data;
+
+	gchar *exe_path = NULL;
+
+#ifdef __APPLE__
+	uint32_t path_size = 0;
+	if (_NSGetExecutablePath(NULL, &path_size) == -1 && path_size > 0) {
+		char *path_buf = g_malloc(path_size + 1);
+		if (_NSGetExecutablePath(path_buf, &path_size) == 0) {
+			path_buf[path_size] = '\0';
+			exe_path = g_canonicalize_filename(path_buf, NULL);
+		}
+		g_free(path_buf);
+	}
+#else
+	exe_path = g_file_read_link("/proc/self/exe", NULL);
+#endif
+
+	if (exe_path == NULL) {
+		show_message(_("Cannot launch a new instance: executable path not found."), MSG_ERR);
+		return;
+	}
+
+	gchar *argv_spawn[] = {exe_path, NULL};
+	GError *spawn_error = NULL;
+
+	if (!g_spawn_async(NULL, argv_spawn, NULL, G_SPAWN_SEARCH_PATH,
+	                   NULL, NULL, NULL, &spawn_error)) {
+		gchar *msg = g_strdup_printf(_("Cannot launch a new instance: %s"),
+		                             spawn_error->message);
+		show_message(msg, MSG_ERR);
+		g_free(msg);
+		g_error_free(spawn_error);
+	}
+
+	g_free(exe_path);
 }
 
 void view_index_toggled_callback(GtkAction *action, gpointer data)

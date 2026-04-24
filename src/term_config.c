@@ -192,6 +192,7 @@ static const struct device_path default_device_paths[] =
 	{ "/dev/ttyS*", 0, 0, 0 },
 	{ "/dev/tts/[0-9]*", 0, 0, 0 },
 	{ "/dev/usb/tts/[0-9]*", 0, 0, 0 },
+	{ "/dev/cu.usbmodem*", 0, 0, 0 },
 	{ NULL, 0, 0, 0 }
 };
 

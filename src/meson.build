@@ -46,7 +46,8 @@ executable(
 		gtk_deps,
 		vte_deps,
 		config,
-		gudev_deps
+		gudev_deps.found() ? gudev_deps : [],
+		iconv_deps
 	],
 	install : true
 )
